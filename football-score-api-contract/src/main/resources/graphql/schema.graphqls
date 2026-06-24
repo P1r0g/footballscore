@@ -1,0 +1,135 @@
+# =============================================================================
+# GraphQL-контракт для Football Score API
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# ENUM
+# ---------------------------------------------------------------------------
+
+enum MatchStatus {
+    SCHEDULED
+    LIVE
+    HALFTIME
+    FINISHED
+    CANCELLED
+}
+
+# ---------------------------------------------------------------------------
+# TYPES
+# ---------------------------------------------------------------------------
+
+type Team {
+    id: ID!
+    name: String!
+    country: String!
+    coach: String!
+
+    matches(page: Int = 0, size: Int = 20): MatchConnection!
+}
+
+type Match {
+    id: ID!
+    homeScore: Int!
+    awayScore: Int!
+    status: MatchStatus!
+
+    homeTeam: Team!
+    awayTeam: Team!
+}
+
+# ---------------------------------------------------------------------------
+# PAGINATION
+# ---------------------------------------------------------------------------
+
+type MatchConnection {
+    content: [Match!]!
+    pageInfo: PageInfo!
+    totalElements: Int!
+}
+
+type TeamConnection {
+    content: [Team!]!
+    pageInfo: PageInfo!
+    totalElements: Int!
+}
+
+type PageInfo {
+    pageNumber: Int!
+    pageSize: Int!
+    totalPages: Int!
+    last: Boolean!
+}
+
+# ---------------------------------------------------------------------------
+# INPUT TYPES
+# ---------------------------------------------------------------------------
+
+input CreateMatchInput {
+    homeTeamId: ID!
+    awayTeamId: ID!
+}
+
+input CreateTeamInput {
+    name: String!
+    country: String!
+    coach: String!
+}
+
+input UpdateTeamInput {
+    name: String!
+    country: String!
+    coach: String!
+}
+
+input MatchFilter {
+    teamId: ID
+    status: MatchStatus
+}
+
+input GoalInput {
+    teamId: ID!
+}
+
+input UpdateMatchStatusInput {
+    status: MatchStatus!
+}
+
+# ---------------------------------------------------------------------------
+# QUERY
+# ---------------------------------------------------------------------------
+
+type Query {
+
+    match(id: ID!): Match
+
+    matches(
+        filter: MatchFilter,
+        page: Int = 0,
+        size: Int = 20
+    ): MatchConnection!
+
+    team(id: ID!): Team
+
+    teams(page: Int = 0, size: Int = 20): TeamConnection!
+}
+
+# ---------------------------------------------------------------------------
+# MUTATION
+# ---------------------------------------------------------------------------
+
+type Mutation {
+
+    createMatch(input: CreateMatchInput!): Match!
+    deleteMatch(id: ID!): Boolean!
+
+    addGoal(matchId: ID!, input: GoalInput!): Match!
+
+    updateMatchStatus(
+        matchId: ID!,
+        input: UpdateMatchStatusInput!
+    ): Match!
+
+    createTeam(input: CreateTeamInput!): Team!
+    updateTeam(id: ID!, input: UpdateTeamInput!): Team!
+    deleteTeam(id: ID!): Boolean!
+}

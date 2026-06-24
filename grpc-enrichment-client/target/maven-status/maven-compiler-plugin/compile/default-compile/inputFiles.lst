@@ -1,0 +1,5 @@
+D:\учеба\курсовые работы\6 семестр\Сервис-ориентированное программирование\footballscore\grpc-enrichment-client\src\main\java\edu\rutmiit\demo\grpcenrichment\config\GrpcClientConfig.java
+D:\учеба\курсовые работы\6 семестр\Сервис-ориентированное программирование\footballscore\grpc-enrichment-client\src\main\java\edu\rutmiit\demo\grpcenrichment\config\RabbitMQConfig.java
+D:\учеба\курсовые работы\6 семестр\Сервис-ориентированное программирование\footballscore\grpc-enrichment-client\src\main\java\edu\rutmiit\demo\grpcenrichment\GrpcEnrichmentClientApplication.java
+D:\учеба\курсовые работы\6 семестр\Сервис-ориентированное программирование\footballscore\grpc-enrichment-client\src\main\java\edu\rutmiit\demo\grpcenrichment\listener\MatchEnrichmentListener.java
+D:\учеба\курсовые работы\6 семестр\Сервис-ориентированное программирование\footballscore\grpc-enrichment-client\src\main\java\edu\rutmiit\demo\grpcenrichment\publisher\EnrichmentEventPublisher.java
