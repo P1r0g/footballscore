@@ -5,12 +5,12 @@ option java_multiple_files = true;
 
 package matchanalytics;
 
-service MatchAnalytics {
+    service MatchAnalytics {
 
-  rpc AnalyzeMatch
-      (AnalyzeMatchRequest)
-      returns (MatchAnalysisResponse);
-}
+      rpc AnalyzeMatch
+          (AnalyzeMatchRequest)
+          returns (MatchAnalysisResponse);
+    }
 
 message AnalyzeMatchRequest {
 

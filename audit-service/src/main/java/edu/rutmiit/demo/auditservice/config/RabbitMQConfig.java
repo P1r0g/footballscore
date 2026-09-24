@@ -39,8 +39,6 @@ public class RabbitMQConfig {
      * Jackson2JsonMessageConverter. Работает с Jackson 3, который стал
      * стандартом в Spring Boot 4.
      *
-     * Принимаем ObjectMapper из контекста Spring Boot — он уже настроен
-     * с поддержкой java.time (Instant, LocalDate) через автоконфигурацию.
      */
     @Bean
     public MessageConverter jsonMessageConverter(JsonMapper jsonMapper) {
@@ -85,8 +83,8 @@ public class RabbitMQConfig {
      * Topic exchange — точка обмена, через которую проходят все доменные события.
      *
      * Topic exchange маршрутизирует сообщения по routing key:
-     * - "book.created"  → попадёт в очередь с binding key "book.*"
-     * - "author.deleted" → попадёт в очередь с binding key "#" (все события)
+     * - "match.created"  → попадёт в очередь с binding key "match.*"
+     * - "team.deleted" → попадёт в очередь с binding key "#" (все события)
      *
      * durable=true: exchange выживает перезапуск RabbitMQ.
      */
@@ -151,8 +149,8 @@ public class RabbitMQConfig {
      * Binding key "#" означает «все сообщения» — audit-service фиксирует всё.
      *
      * В продакшене можно создать несколько очередей с разными binding key:
-     * - q.audit.books с "book.*" — только события книг,
-     * - q.notification.authors с "author.created" — уведомления при создании автора.
+     * - q.audit.match с "match.*" — только события матчей,
+     * - q.notification.team с "team.created" — уведомления при создании команды.
      */
     @Bean
     public Binding auditBinding(Queue auditQueue, TopicExchange eventsExchange) {

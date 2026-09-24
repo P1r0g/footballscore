@@ -19,21 +19,22 @@
         }
 
         :root {
-            --bg-primary: #0f1117;
-            --bg-secondary: #1a1d27;
-            --bg-card: #222635;
-            --bg-card-hover: #2a2e3d;
-            --border: #2e3347;
-            --text-primary: #e4e7ef;
-            --text-secondary: #8b92a8;
-            --text-muted: #5c6380;
-            --accent-blue: #5b8def;
-            --accent-green: #34d399;
-            --accent-amber: #fbbf24;
-            --accent-red: #f87171;
-            --accent-purple: #a78bfa;
-            --accent-cyan: #22d3ee;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            /* Светлая тема */
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f5f7fa;
+            --border: #e2e6ed;
+            --text-primary: #1a1d27;
+            --text-secondary: #4a5168;
+            --text-muted: #8b92a8;
+            --accent-blue: #4a7cf7;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             --radius: 12px;
             --radius-sm: 8px;
         }
@@ -61,6 +62,7 @@
             top: 0;
             z-index: 100;
             backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .header-left {
@@ -78,6 +80,7 @@
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.02em;
+            color: var(--text-primary);
         }
 
         .header-subtitle {
@@ -113,28 +116,28 @@
         }
 
         .status.connected {
-            border-color: rgba(52, 211, 153, 0.3);
+            border-color: rgba(16, 185, 129, 0.4);
         }
         .status.connected .status-dot {
             background: var(--accent-green);
-            box-shadow: 0 0 8px var(--accent-green);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
             animation: pulse-green 2s infinite;
         }
 
         .status.disconnected {
-            border-color: rgba(248, 113, 113, 0.3);
+            border-color: rgba(239, 68, 68, 0.4);
         }
         .status.disconnected .status-dot {
             background: var(--accent-red);
-            box-shadow: 0 0 8px var(--accent-red);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
         }
 
         .status.reconnecting {
-            border-color: rgba(251, 191, 36, 0.3);
+            border-color: rgba(245, 158, 11, 0.4);
         }
         .status.reconnecting .status-dot {
             background: var(--accent-amber);
-            box-shadow: 0 0 8px var(--accent-amber);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
             animation: pulse-amber 1s infinite;
         }
 
@@ -192,9 +195,15 @@
             border-color: var(--text-muted);
         }
 
-        .btn-danger:hover {
-            border-color: rgba(248, 113, 113, 0.5);
+        .btn-danger {
             color: var(--accent-red);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
         }
 
         .container {
@@ -218,12 +227,14 @@
         .empty-state-text {
             font-size: 16px;
             margin-bottom: 8px;
+            color: var(--text-secondary);
         }
 
         .empty-state-hint {
             font-size: 13px;
             max-width: 400px;
             margin: 0 auto;
+            color: var(--text-muted);
         }
 
         .notification {
@@ -238,12 +249,14 @@
             animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .notification:hover {
             background: var(--bg-card-hover);
             border-color: var(--text-muted);
             transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
         .notification::before {
@@ -284,10 +297,10 @@
 
         @keyframes glow {
             0% {
-                box-shadow: 0 0 20px rgba(91, 141, 239, 0.3);
+                box-shadow: 0 0 20px rgba(74, 124, 247, 0.15);
             }
             100% {
-                box-shadow: none;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             }
         }
 
@@ -303,22 +316,22 @@
         }
 
         .icon-book-plus {
-            background: rgba(52, 211, 153, 0.12);
+            background: rgba(16, 185, 129, 0.12);
         }
         .icon-book-edit {
-            background: rgba(91, 141, 239, 0.12);
+            background: rgba(74, 124, 247, 0.12);
         }
         .icon-book-remove {
-            background: rgba(248, 113, 113, 0.12);
+            background: rgba(239, 68, 68, 0.12);
         }
         .icon-analytics {
-            background: rgba(167, 139, 250, 0.12);
+            background: rgba(139, 92, 246, 0.12);
         }
         .icon-user-plus {
-            background: rgba(34, 211, 238, 0.12);
+            background: rgba(6, 182, 212, 0.12);
         }
         .icon-user-remove {
-            background: rgba(251, 191, 36, 0.12);
+            background: rgba(245, 158, 11, 0.12);
         }
         .icon-bell {
             background: rgba(139, 146, 168, 0.12);
@@ -333,6 +346,7 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 3px;
+            color: var(--text-primary);
         }
 
         .notification-desc {
@@ -369,10 +383,11 @@
             padding: 16px;
             font-family: "JetBrains Mono", "Fira Code", monospace;
             font-size: 11px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             max-height: 200px;
             overflow-y: auto;
             display: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .log-area.visible {

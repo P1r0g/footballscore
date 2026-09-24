@@ -43,6 +43,8 @@ public class MatchEnrichmentListener {
         AnalyzeMatchRequest request =
                 AnalyzeMatchRequest.newBuilder()
                         .setMatchId(event.matchId())
+                        .setHomeTeamName(event.teamHomeName())
+                        .setAwayTeamName(event.teamAwayName())
                         .setHomeScore(event.homeScore())
                         .setAwayScore(event.awayScore())
                         .build();

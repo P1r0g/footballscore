@@ -65,7 +65,9 @@ public class MatchEventPublisher {
                 match.getId(),
                 teamName,
                 match.getHomeScore(),
-                match.getAwayScore()
+                match.getAwayScore(),
+                match.getHomeTeam().getName(),
+                match.getAwayTeam().getName()
         );
         send(RoutingKeys.MATCH_GOAL_SCORED, event);
     }

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  * Контракт API для управления командами.
  * Реализующий контроллер в сервисе должен имплементировать этот интерфейс.
  */
-@Tag(name = "Authors", description = "Управление командами")
+@Tag(name = "Teams", description = "Управление командами")
 @RequestMapping(
         value = "/api/teams",
         produces = MediaType.APPLICATION_JSON_VALUE

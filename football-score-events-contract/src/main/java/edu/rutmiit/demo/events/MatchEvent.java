@@ -35,7 +35,9 @@ public sealed interface MatchEvent {
             Long matchId,
             String teamName,
             Short homeScore,
-            Short awayScore
+            Short awayScore,
+            String teamHomeName,
+            String teamAwayName
     ) implements MatchEvent {}
 
     /**
