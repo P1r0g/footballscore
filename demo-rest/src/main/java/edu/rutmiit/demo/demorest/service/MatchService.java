@@ -253,6 +253,7 @@ public class MatchService {
                 .name(entity.getName())
                 .country(entity.getCountry())
                 .coach(entity.getCoach())
+                .stadium(entity.getStadium())
                 .build();
     }
 

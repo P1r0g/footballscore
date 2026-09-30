@@ -19,6 +19,9 @@ public class TeamEntity {
     @Column(nullable = false, length = 255)
     private String coach;
 
+    @Column(name = "stadium", length = 255)
+    private String stadium;
+
     public TeamEntity() {
     }
 
@@ -49,4 +52,11 @@ public class TeamEntity {
     public void setCoach(String coach) {
         this.coach = coach;
     }
-}
+
+    public String getStadium() {
+        return stadium;
+    }
+
+    public void setStadium(String stadium) {
+        this.stadium = stadium;
+    }}

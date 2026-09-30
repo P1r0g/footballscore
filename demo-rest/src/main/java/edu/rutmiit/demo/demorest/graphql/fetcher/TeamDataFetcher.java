@@ -69,7 +69,8 @@ public class TeamDataFetcher {
         TeamRequest request = new TeamRequest(
                 input.name(),
                 input.country(),
-                input.coach()
+                input.coach(),
+                input.stadium()
         );
         return teamService.create(request);
     }
@@ -83,7 +84,8 @@ public class TeamDataFetcher {
         TeamRequest request = new TeamRequest(
                 input.name(),
                 input.country(),
-                input.coach()
+                input.coach(),
+                input.stadium()
         );
         return teamService.update(Long.parseLong(id), request);
     }

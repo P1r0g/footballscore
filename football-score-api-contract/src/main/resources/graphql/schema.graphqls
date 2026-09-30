@@ -23,6 +23,7 @@ type Team {
     name: String!
     country: String!
     coach: String!
+    stadium: String
 
     matches(page: Int = 0, size: Int = 20): MatchConnection!
 }
@@ -73,11 +74,13 @@ input CreateTeamInput {
     name: String!
     country: String!
     coach: String!
+    stadium: String
 }
 
 input UpdateTeamInput {
     name: String!
     country: String!
+    stadium: String
     coach: String!
 }
 

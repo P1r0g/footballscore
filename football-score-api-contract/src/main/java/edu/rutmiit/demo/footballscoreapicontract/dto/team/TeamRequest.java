@@ -23,5 +23,9 @@ public record TeamRequest(
         @Schema(description = "ФИО тренера команды", example = "Жозе Моуриньо")
         @NotBlank(message = "Тренер команды должен существовать")
         @Size(max = 255, message = "ФИО тренера не может превышать 255 символов")
-        String coach
+        String coach,
+
+        @Schema(description = "Стадион команды", example = "Сантьяго Бернабеу")
+        @Size(max = 255, message = "Название стадиона не может превышать 255 символов")
+        String stadium
 ) {}

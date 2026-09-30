@@ -67,6 +67,7 @@ public class TeamService {
         entity.setName(request.name());
         entity.setCountry(request.country());
         entity.setCoach(request.coach());
+        entity.setStadium(request.stadium());
 
         TeamResponse response = toResponse(
                 teamRepository.save(entity)
@@ -84,6 +85,7 @@ public class TeamService {
         entity.setName(request.name());
         entity.setCountry(request.country());
         entity.setCoach(request.coach());
+        entity.setStadium(request.stadium());
 
         TeamResponse response = toResponse(
                 teamRepository.save(entity)
@@ -108,6 +110,10 @@ public class TeamService {
 
         if (request.coach() != null) {
             entity.setCoach(request.coach());
+        }
+
+        if (request.stadium() != null) {
+            entity.setStadium(request.stadium());
         }
 
         TeamResponse response = toResponse(
@@ -146,6 +152,7 @@ public class TeamService {
                 .name(entity.getName())
                 .country(entity.getCountry())
                 .coach(entity.getCoach())
+                .stadium(entity.getStadium())
                 .build();
     }
 
