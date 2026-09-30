@@ -1,12 +1,15 @@
 package edu.rutmiit.demo.demorest.graphql.exception;
 
 import com.netflix.graphql.types.errors.TypedGraphQLError;
-//import edu.rutmiit.demo.footballscoreapicontract.exception.IsbnAlreadyExistsException;
 import edu.rutmiit.demo.footballscoreapicontract.exception.ResourceNotFoundException;
 import graphql.execution.DataFetcherExceptionHandler;
 import graphql.execution.DataFetcherExceptionHandlerParameters;
 import graphql.execution.DataFetcherExceptionHandlerResult;
 import org.springframework.stereotype.Component;
+import graphql.GraphqlErrorBuilder;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.util.Map;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -31,6 +34,20 @@ public class GraphQLExceptionHandler implements DataFetcherExceptionHandler {
             DataFetcherExceptionHandlerParameters handlerParameters) {
 
         Throwable exception = handlerParameters.getException();
+
+        if (exception instanceof AccessDeniedException) {
+            var error = GraphqlErrorBuilder.newError()
+                    .message("Недостаточно прав для выполнения операции")
+                    .path(handlerParameters.getPath().toList())
+                    .extensions(Map.of("code", "FORBIDDEN"))
+                    .build();
+
+            return CompletableFuture.completedFuture(
+                    DataFetcherExceptionHandlerResult.newResult()
+                            .error(error)
+                            .build()
+            );
+        }
 
         // Ресурс не найден — аналог HTTP 404
         if (exception instanceof ResourceNotFoundException) {

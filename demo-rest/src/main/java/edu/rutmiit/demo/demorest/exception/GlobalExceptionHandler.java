@@ -1,7 +1,6 @@
 package edu.rutmiit.demo.demorest.exception;
 
 import edu.rutmiit.demo.footballscoreapicontract.dto.ErrorResponse;
-//import edu.rutmiit.demo.footballscoreapicontract.exception.IsbnAlreadyExistsException;
 import edu.rutmiit.demo.footballscoreapicontract.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -9,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,
                                                                 HttpServletRequest req) {
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(
@@ -89,6 +90,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception ex, HttpServletRequest req) {
         // Место для логирования: log.error("Unexpected error", ex);
+        if (ex instanceof AccessDeniedException accessDeniedException) {
+            throw accessDeniedException;
+        }
+
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(
