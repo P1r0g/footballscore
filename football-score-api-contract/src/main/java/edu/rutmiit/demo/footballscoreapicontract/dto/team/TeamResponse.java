@@ -35,4 +35,7 @@ public class TeamResponse extends RepresentationModel<TeamResponse> {
     @Schema(description = "ФИО тренера команды", example = "Жозе Моуриньо")
     private final String coach;
 
+    @Schema(description = "Стадион команды", example = "Сантьяго Бернабеу")
+    private final String stadium;
+
 }
