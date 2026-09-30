@@ -169,7 +169,7 @@ public class MatchService {
 
         storage.matches.put(matchId, updated);
 
-        eventPublisher.publishGoalScored(updated, storage.teams.get(request.teamId()).getName());
+        eventPublisher.publishGoalScored(updated, teamService.findById(request.teamId()).getName());
 
         return updated;
     }
