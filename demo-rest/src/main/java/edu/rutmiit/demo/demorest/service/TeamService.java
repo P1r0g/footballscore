@@ -3,9 +3,7 @@ package edu.rutmiit.demo.demorest.service;
 import edu.rutmiit.demo.demorest.entity.TeamEntity;
 import edu.rutmiit.demo.demorest.event.TeamEventPublisher;
 import edu.rutmiit.demo.demorest.repository.TeamRepository;
-import edu.rutmiit.demo.demorest.storage.InMemoryStorage;
 import edu.rutmiit.demo.footballscoreapicontract.dto.PagedResponse;
-import edu.rutmiit.demo.footballscoreapicontract.dto.match.MatchResponse;
 import edu.rutmiit.demo.footballscoreapicontract.dto.team.PatchTeamRequest;
 import edu.rutmiit.demo.footballscoreapicontract.dto.team.TeamRequest;
 import edu.rutmiit.demo.footballscoreapicontract.dto.team.TeamResponse;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import edu.rutmiit.demo.demorest.repository.MatchRepository;
 
 import java.util.List;
 
@@ -25,16 +24,16 @@ import java.util.List;
 public class TeamService {
 
     private final TeamRepository teamRepository;
-    private final InMemoryStorage storage;
+    private final MatchRepository matchRepository;
     private final TeamEventPublisher eventPublisher;
 
     public TeamService(
             TeamRepository teamRepository,
-            InMemoryStorage storage,
+            MatchRepository matchRepository,
             TeamEventPublisher eventPublisher
     ) {
         this.teamRepository = teamRepository;
-        this.storage = storage;
+        this.matchRepository = matchRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -125,19 +124,13 @@ public class TeamService {
         TeamEntity entity = getEntity(id);
         TeamResponse response = toResponse(entity);
 
-        // До V2 матчи ещё хранятся в памяти.
-        List<Long> matchIds = storage.matches.values()
-                .stream()
-                .filter(match -> containsTeam(match, id))
-                .map(MatchResponse::getId)
-                .toList();
+        int matchesCount = matchRepository.deleteByTeamId(id);
 
         teamRepository.delete(entity);
 
-        afterCommit(() -> {
-            matchIds.forEach(storage.matches::remove);
-            eventPublisher.publishDeleted(response, matchIds.size());
-        });
+        afterCommit(() ->
+                eventPublisher.publishDeleted(response, matchesCount)
+        );
     }
 
     private TeamEntity getEntity(Long id) {
@@ -154,13 +147,6 @@ public class TeamService {
                 .country(entity.getCountry())
                 .coach(entity.getCoach())
                 .build();
-    }
-
-    private boolean containsTeam(MatchResponse match, Long teamId) {
-        return (match.getHomeTeam() != null
-                && teamId.equals(match.getHomeTeam().getId()))
-                || (match.getAwayTeam() != null
-                && teamId.equals(match.getAwayTeam().getId()));
     }
 
     private void afterCommit(Runnable action) {
