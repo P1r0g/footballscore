@@ -11,6 +11,7 @@ import edu.rutmiit.demo.footballscoreapicontract.exception.ResourceNotFoundExcep
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("hasAnyRole('READER', 'EDITOR')")
 public class TeamService {
 
     private final TeamRepository teamRepository;
@@ -62,6 +64,7 @@ public class TeamService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public TeamResponse create(TeamRequest request) {
         TeamEntity entity = new TeamEntity();
         entity.setName(request.name());
@@ -79,6 +82,7 @@ public class TeamService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public TeamResponse update(Long id, TeamRequest request) {
         TeamEntity entity = getEntity(id);
 
@@ -97,6 +101,7 @@ public class TeamService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public TeamResponse patchTeam(Long id, PatchTeamRequest request) {
         TeamEntity entity = getEntity(id);
 
@@ -126,6 +131,7 @@ public class TeamService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public void delete(Long id) {
         TeamEntity entity = getEntity(id);
         TeamResponse response = toResponse(entity);

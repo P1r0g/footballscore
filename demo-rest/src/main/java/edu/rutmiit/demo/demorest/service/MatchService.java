@@ -16,6 +16,7 @@ import edu.rutmiit.demo.footballscoreapicontract.exception.ResourceNotFoundExcep
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("hasAnyRole('READER', 'EDITOR')")
 public class MatchService {
 
     private final MatchRepository matchRepository;
@@ -78,6 +80,7 @@ public class MatchService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public MatchResponse createMatch(MatchRequest request) {
         if (request.homeTeamId() == null || request.awayTeamId() == null) {
             throw new IllegalArgumentException(
@@ -111,6 +114,7 @@ public class MatchService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public void deleteMatch(Long id) {
         MatchEntity entity = getForUpdate(id);
         MatchResponse response = toResponse(entity);
@@ -125,11 +129,13 @@ public class MatchService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public void deleteMatchesByTeamId(Long teamId) {
         matchRepository.deleteByTeamId(teamId);
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public MatchResponse addGoal(Long matchId, GoalRequest request) {
         MatchEntity entity = getForUpdate(matchId);
 
@@ -173,6 +179,7 @@ public class MatchService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('EDITOR')")
     public MatchResponse updateMatchStatus(
             Long matchId,
             MatchStatusRequest request
