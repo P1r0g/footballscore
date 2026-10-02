@@ -1,4 +1,15 @@
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.2
+    command: [ "start-dev" ]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8085
+    ports:
+      - "127.0.0.1:8085:8080"
+    volumes:
+      - footballscore_keycloak_data:/opt/keycloak/data
   postgres:
     image: postgres:17-alpine
     environment:
@@ -10,10 +21,10 @@ services:
     volumes:
       - footballscore_pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U football -d footballscore"]
+      test: [ "CMD-SHELL", "pg_isready -U football -d footballscore" ]
       interval: 5s
       timeout: 5s
       retries: 10
-
 volumes:
   footballscore_pg_data:
+  footballscore_keycloak_data:

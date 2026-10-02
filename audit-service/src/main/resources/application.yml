@@ -2,6 +2,15 @@ spring:
   application:
     name: audit-service
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/realms/footballscore
+          jwk-set-uri: http://127.0.0.1:8085/realms/footballscore/protocol/openid-connect/certs
+          audiences:
+            - audit-service
+
   # ─── RabbitMQ ───────────────────────────────────────────────────────
   # Подключение к локальному брокеру (docker run rabbitmq:4-management)
   rabbitmq:
