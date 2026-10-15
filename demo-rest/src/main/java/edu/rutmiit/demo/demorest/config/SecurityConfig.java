@@ -13,9 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 @EnableMethodSecurity
+@Profile("session-auth")
 public class SecurityConfig {
 
     @Bean

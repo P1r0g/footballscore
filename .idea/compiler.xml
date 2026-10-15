@@ -9,6 +9,7 @@
         <module name="grpc-analytics-server" />
         <module name="audit-service" />
         <module name="football-score-events-contract" />
+        <module name="gateway-service" />
         <module name="grpc-enrichment-client" />
         <module name="demo-rest" />
         <module name="notification-service" />
@@ -37,6 +38,7 @@
       <module name="demo-rest" options="-parameters" />
       <module name="football-score-api-contract" options="-parameters" />
       <module name="football-score-grpc-contract" options="-parameters" />
+      <module name="gateway-service" options="-parameters" />
       <module name="grpc-analytics-server" options="-parameters" />
       <module name="grpc-enrichment-client" options="-parameters" />
       <module name="notification-service" options="-parameters" />

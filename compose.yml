@@ -10,6 +10,17 @@ services:
       - "127.0.0.1:8085:8080"
     volumes:
       - footballscore_keycloak_data:/opt/keycloak/data
+  redis:
+    image: redis:8.2-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - footballscore_redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
   postgres:
     image: postgres:17-alpine
     environment:
@@ -28,3 +39,4 @@ services:
 volumes:
   footballscore_pg_data:
   footballscore_keycloak_data:
+  footballscore_redis_data:
