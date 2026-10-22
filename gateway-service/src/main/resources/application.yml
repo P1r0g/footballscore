@@ -11,6 +11,9 @@ spring:
   application:
     name: gateway-service
 
+  reactor:
+    context-propagation: auto
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -47,6 +50,31 @@ spring:
             - id: footballscore-api
               uri: ${FOOTBALLSCORE_API_URL:http://localhost:8080}
               predicates:
-                - Path=/api/teams,/api/teams/**,/api/matches,/api/matches/**
+                - Path=/api/teams,/api/teams/**,/api/matches,/api/matches/**,/api/audit,/api/audit/**
               filters:
                 - TokenRelay=
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  observations:
+    enable:
+      spring.security: false
+  tracing:
+    propagation:
+      type: w3c
+    sampling:
+      probability: 1.0
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+
+logging:
+  file:
+    name: ${LOG_DIR:../runtime-logs}/gateway-service.log
+  include-application-name: false
+  pattern:
+    correlation: "[${spring.application.name:},trace_id=%X{traceId:-},span_id=%X{spanId:-},request_id=%X{requestId:-}] "

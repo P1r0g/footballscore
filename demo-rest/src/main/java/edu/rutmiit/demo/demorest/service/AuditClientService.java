@@ -1,13 +1,18 @@
 package edu.rutmiit.demo.demorest.service;
 
+import edu.rutmiit.demo.demorest.config.RequestIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 @Service
 public class AuditClientService {
@@ -20,17 +25,33 @@ public class AuditClientService {
 
     public AuditClientService(
             OAuth2AuthorizedClientManager authorizedClientManager,
-            @Value("${audit.service.base-url}") String baseUrl) {
-
+            RestClient.Builder builder,
+            @Value("${audit.service.base-url}") String baseUrl
+    ) {
         this.authorizedClientManager = authorizedClientManager;
 
-        var requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(5000);
-        requestFactory.setReadTimeout(10000);
+        var httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofMillis(500))
+                .build();
 
-        this.restClient = RestClient.builder()
+        var requestFactory =
+                new JdkClientHttpRequestFactory(httpClient);
+
+        requestFactory.setReadTimeout(Duration.ofSeconds(2));
+
+        this.restClient = builder
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
+                .requestInterceptor((request, body, execution) -> {
+                    String requestId = MDC.get(RequestIds.MDC_KEY);
+
+                    if (requestId != null) {
+                        request.getHeaders()
+                                .set(RequestIds.HEADER, requestId);
+                    }
+
+                    return execution.execute(request, body);
+                })
                 .build();
     }
 
@@ -49,9 +70,10 @@ public class AuditClientService {
             );
         }
 
-        String accessToken = authorizedClient.getAccessToken().getTokenValue();
+        String accessToken =
+                authorizedClient.getAccessToken().getTokenValue();
 
-        log.info("Запрашиваем GET /api/audit у audit-service от имени demo-rest-client");
+        log.info("Calling audit-service GET /api/audit");
 
         String response = restClient.get()
                 .uri("/api/audit")

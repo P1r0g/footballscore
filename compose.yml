@@ -1,4 +1,47 @@
 services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: dca6e525b74d
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - footballscore_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.132.0
+    command: [ "--config=/etc/otelcol/config.yaml" ]
+    volumes:
+      - ./infra/otel/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "127.0.0.1:4318:4318"
+    depends_on:
+      - tempo
+  tempo:
+    image: grafana/tempo:2.8.2
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./infra/tempo/tempo.yaml:/etc/tempo.yaml:ro
+      - footballscore_tempo_data:/var/tempo
+    ports:
+      - "127.0.0.1:3200:3200"
+  grafana:
+    image: grafana/grafana:12.1.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin-dev-only
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - footballscore_grafana_data:/var/lib/grafana
+    depends_on:
+      - tempo
   keycloak:
     image: quay.io/keycloak/keycloak:26.3.2
     command: [ "start-dev" ]
@@ -40,3 +83,8 @@ volumes:
   footballscore_pg_data:
   footballscore_keycloak_data:
   footballscore_redis_data:
+  footballscore_tempo_data:
+  footballscore_grafana_data:
+  footballscore_rabbitmq_data:
+    external: true
+    name: 644a59259bb1ffb7c0961e717dad45a79256dae6c4d9f36e50629c16e7713b66
