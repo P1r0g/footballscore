@@ -1,0 +1,93 @@
+package edu.rutmiit.enterprise.gateway;
+
+import io.micrometer.context.ContextRegistry;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
+public class RequestIdWebFilter implements WebFilter {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(RequestIdWebFilter.class);
+
+    @PostConstruct
+    void registerMdcAccessor() {
+        ContextRegistry.getInstance().registerThreadLocalAccessor(
+                RequestIds.MDC_KEY,
+                () -> MDC.get(RequestIds.MDC_KEY),
+                value -> MDC.put(RequestIds.MDC_KEY, value),
+                () -> MDC.remove(RequestIds.MDC_KEY)
+        );
+    }
+
+    @PreDestroy
+    void removeMdcAccessor() {
+        ContextRegistry.getInstance()
+                .removeThreadLocalAccessor(RequestIds.MDC_KEY);
+    }
+
+    @Override
+    public Mono<Void> filter(
+            ServerWebExchange exchange,
+            WebFilterChain chain
+    ) {
+        String requestId = RequestIds.normalize(
+                exchange.getRequest().getHeaders()
+                        .getOrDefault(RequestIds.HEADER, List.of())
+        );
+
+        var request = exchange.getRequest().mutate()
+                .headers(headers ->
+                        headers.set(RequestIds.HEADER, requestId))
+                .build();
+
+        var correlatedExchange = exchange.mutate()
+                .request(request)
+                .build();
+
+        exchange.getResponse().getHeaders()
+                .set(RequestIds.HEADER, requestId);
+
+        exchange.getResponse().beforeCommit(() -> {
+            exchange.getResponse().getHeaders()
+                    .set(RequestIds.HEADER, requestId);
+            return Mono.empty();
+        });
+
+        return Mono.defer(() -> {
+            log.info(
+                    "HTTP request method={} path={}",
+                    request.getMethod(),
+                    request.getPath().value()
+            );
+
+            return chain.filter(correlatedExchange)
+                    .doOnSuccess(unused -> {
+                        var status = exchange.getResponse().getStatusCode();
+
+                        log.info(
+                                "HTTP response status={}",
+                                status == null ? 200 : status.value()
+                        );
+                    })
+                    .doOnError(error -> log.warn(
+                            "HTTP request failed type={}",
+                            error.getClass().getSimpleName()
+                    ));
+        }).contextWrite(context ->
+                context.put(RequestIds.MDC_KEY, requestId));
+    }
+}
