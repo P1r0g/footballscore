@@ -19,8 +19,12 @@ public class SecurityConfig {
     SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(auth -> auth
-                        .pathMatchers("/", "/index.html", "/favicon.ico", "/bff/csrf",
-                                "/oauth2/**", "/login/**").permitAll()
+                        .pathMatchers(
+                                "/", "/index.html", "/favicon.ico", "/bff/csrf",
+                                "/oauth2/**", "/login/**",
+                                "/actuator/health", "/actuator/health/**",
+                                "/actuator/prometheus"
+                        ).permitAll()
                         .anyExchange().authenticated())
                 .oauth2Login(Customizer.withDefaults())
                 .oauth2Client(Customizer.withDefaults())

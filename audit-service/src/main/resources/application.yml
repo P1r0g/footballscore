@@ -39,25 +39,41 @@ server:
   port: 8081
 
 management:
+  server:
+    port: 19081
+    address: 127.0.0.1
+
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health,prometheus
+
   endpoint:
     health:
-      show-details: always
+      show-details: never
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 500ms,1s
+
   otlp:
     metrics:
       export:
         enabled: false
+
   observations:
     enable:
       spring.security: false
+
   tracing:
     propagation:
       type: w3c
     sampling:
       probability: 1.0
+
   opentelemetry:
     tracing:
       export:
@@ -67,6 +83,12 @@ management:
 logging:
   file:
     name: ${LOG_DIR:../runtime-logs}/audit-service.log
+
+  structured:
+    format:
+      file: ecs
+
   include-application-name: false
+
   pattern:
     correlation: "[${spring.application.name:},trace_id=%X{traceId:-},span_id=%X{spanId:-},request_id=%X{requestId:-}] "

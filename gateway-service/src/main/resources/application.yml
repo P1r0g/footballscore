@@ -54,6 +54,21 @@ spring:
               filters:
                 - TokenRelay=
 management:
+  server:
+    port: 19088
+    address: 127.0.0.1
+
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 500ms,1s
   otlp:
     metrics:
       export:
@@ -73,8 +88,14 @@ management:
           endpoint: http://localhost:4318/v1/traces
 
 logging:
+  structured:
+    format:
+      file: ecs
+
   file:
     name: ${LOG_DIR:../runtime-logs}/gateway-service.log
+
   include-application-name: false
+
   pattern:
     correlation: "[${spring.application.name:},trace_id=%X{traceId:-},span_id=%X{spanId:-},request_id=%X{requestId:-}] "

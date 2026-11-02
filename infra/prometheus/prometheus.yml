@@ -1,0 +1,32 @@
+rule_files:
+  - /etc/prometheus/sli-rules.yml
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: demo-rest
+    metrics_path: /actuator/prometheus
+    scrape_protocols: [OpenMetricsText1.0.0, PrometheusText0.0.4]
+    static_configs:
+      - targets: ["host.docker.internal:19080"]
+
+  - job_name: audit-service
+    metrics_path: /actuator/prometheus
+    scrape_protocols: [OpenMetricsText1.0.0, PrometheusText0.0.4]
+    static_configs:
+      - targets: ["host.docker.internal:19081"]
+
+  - job_name: gateway-service
+    metrics_path: /actuator/prometheus
+    scrape_protocols: [OpenMetricsText1.0.0, PrometheusText0.0.4]
+    static_configs:
+      - targets: ["host.docker.internal:19088"]

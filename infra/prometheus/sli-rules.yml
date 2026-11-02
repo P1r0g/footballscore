@@ -1,0 +1,59 @@
+groups:
+  - name: footballscore-audit-sli
+    interval: 5s
+    rules:
+      - record: footballscore:audit_eligible:increase5m
+        expr: |
+          sum(increase(http_server_requests_seconds_count{
+            job="demo-rest",
+            method="GET",
+            uri="/api/audit",
+            status=~"2..|5.."
+          }[5m]))
+
+      - record: footballscore:audit_good:increase5m
+        expr: |
+          sum(increase(http_server_requests_seconds_bucket{
+            job="demo-rest",
+            method="GET",
+            uri="/api/audit",
+            status=~"2..",
+            le="0.5"
+          }[5m]))
+          or (0 * footballscore:audit_eligible:increase5m)
+
+      - record: footballscore:audit_sli:ratio5m
+        expr: |
+          footballscore:audit_good:increase5m
+          /
+          footballscore:audit_eligible:increase5m
+
+      - record: footballscore:audit_eligible:increase7d
+        expr: |
+          sum(increase(http_server_requests_seconds_count{
+            job="demo-rest",
+            method="GET",
+            uri="/api/audit",
+            status=~"2..|5.."
+          }[7d]))
+
+      - record: footballscore:audit_good:increase7d
+        expr: |
+          sum(increase(http_server_requests_seconds_bucket{
+            job="demo-rest",
+            method="GET",
+            uri="/api/audit",
+            status=~"2..",
+            le="0.5"
+          }[7d]))
+          or (0 * footballscore:audit_eligible:increase7d)
+
+      - record: footballscore:audit_sli:ratio7d
+        expr: |
+          footballscore:audit_good:increase7d
+          /
+          footballscore:audit_eligible:increase7d
+
+      - record: footballscore:audit_error_budget_remaining:ratio7d
+        expr: |
+          1 - ((1 - footballscore:audit_sli:ratio7d) / 0.005)
