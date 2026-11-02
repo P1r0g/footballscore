@@ -1,0 +1,94 @@
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 5s
+
+tests:
+  - name: High error rate fires after the waiting period
+    interval: 5s
+    input_series:
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="200"}'
+        values: '0+10x36'
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="500"}'
+        values: '0+10x36'
+    alert_rule_test:
+      - eval_time: 10s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: []
+      - eval_time: 60s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: &audit_firing
+          - exp_labels:
+              severity: critical
+              service: demo-rest
+              scenario: audit-query
+            exp_annotations:
+              summary: "Высокая доля ошибок просмотра журнала аудита"
+              description: "Доля HTTP 5xx превышает 20% за минуту при наличии минимум 10 запросов. Условие сохраняется 20 секунд."
+              dashboard_url: "http://localhost:3000/d/footballscore-observability"
+
+  - name: Low request volume does not fire
+    interval: 30s
+    input_series:
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="200"}'
+        values: '0+0x6'
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="500"}'
+        values: '0+1x6'
+    alert_rule_test:
+      - eval_time: 60s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: []
+      - eval_time: 120s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: []
+
+  - name: Ten percent errors does not fire
+    interval: 5s
+    input_series:
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="200"}'
+        values: '0+9x36'
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="500"}'
+        values: '0+1x36'
+    alert_rule_test:
+      - eval_time: 60s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: []
+
+  - name: Error rate alert resolves after recovery
+    interval: 5s
+    input_series:
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="200"}'
+        values: '0+0x12 0+10x24'
+      - series: 'http_server_requests_seconds_count{job="demo-rest",method="GET",uri="/api/audit",status="500"}'
+        values: '0+10x12 120+0x24'
+    alert_rule_test:
+      - eval_time: 60s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: *audit_firing
+      - eval_time: 180s
+        alertname: FootballScoreAuditHighErrorRate
+        exp_alerts: []
+
+  - name: Service down alert fires and resolves
+    interval: 5s
+    input_series:
+      - series: 'up{job="audit-service",instance="host.docker.internal:19081"}'
+        values: '0+0x12 1+0x24'
+    alert_rule_test:
+      - eval_time: 20s
+        alertname: FootballScoreServiceDown
+        exp_alerts: []
+      - eval_time: 30s
+        alertname: FootballScoreServiceDown
+        exp_alerts:
+          - exp_labels:
+              job: audit-service
+              instance: host.docker.internal:19081
+              severity: critical
+            exp_annotations:
+              summary: "Недоступны метрики сервиса audit-service"
+              description: "Prometheus не может собрать метрики host.docker.internal:19081 в течение 30 секунд."
+              dashboard_url: "http://localhost:3000/d/footballscore-observability"
+      - eval_time: 90s
+        alertname: FootballScoreServiceDown
+        exp_alerts: []

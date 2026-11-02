@@ -1,0 +1,51 @@
+groups:
+  - name: footballscore-alerts
+    interval: 5s
+    rules:
+      - alert: FootballScoreAuditHighErrorRate
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{
+              job="demo-rest",
+              method="GET",
+              uri="/api/audit",
+              status=~"5.."
+            }[1m]))
+            /
+            sum(rate(http_server_requests_seconds_count{
+              job="demo-rest",
+              method="GET",
+              uri="/api/audit",
+              status=~"2..|5.."
+            }[1m]))
+            > 0.20
+          )
+          and
+          (
+            sum(increase(http_server_requests_seconds_count{
+              job="demo-rest",
+              method="GET",
+              uri="/api/audit",
+              status=~"2..|5.."
+            }[1m]))
+            >= 10
+          )
+        for: 20s
+        labels:
+          severity: critical
+          service: demo-rest
+          scenario: audit-query
+        annotations:
+          summary: "Высокая доля ошибок просмотра журнала аудита"
+          description: "Доля HTTP 5xx превышает 20% за минуту при наличии минимум 10 запросов. Условие сохраняется 20 секунд."
+          dashboard_url: "http://localhost:3000/d/footballscore-observability"
+
+      - alert: FootballScoreServiceDown
+        expr: up{job=~"demo-rest|audit-service|gateway-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Недоступны метрики сервиса {{ $labels.job }}"
+          description: "Prometheus не может собрать метрики {{ $labels.instance }} в течение 30 секунд."
+          dashboard_url: "http://localhost:3000/d/footballscore-observability"

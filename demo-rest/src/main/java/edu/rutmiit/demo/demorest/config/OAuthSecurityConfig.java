@@ -41,6 +41,13 @@ public class OAuthSecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/prometheus"
+                        )
+                        .permitAll()
+
                         .requestMatchers("/error")
                         .permitAll()
 

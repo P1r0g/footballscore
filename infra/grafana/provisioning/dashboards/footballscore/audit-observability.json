@@ -1,0 +1,522 @@
+{
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Audit requests per second",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "sum by (job, uri) (rate(http_server_requests_seconds_count{job=~\"demo-rest|audit-service\",method=\"GET\",uri=\"/api/audit\"}[5m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{job}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 0,
+        "h": 9,
+        "w": 8,
+        "x": 0
+      }
+    },
+    {
+      "id": 2,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Audit latency p95",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (job, uri, le) (rate(http_server_requests_seconds_bucket{job=~\"demo-rest|audit-service\",method=\"GET\",uri=\"/api/audit\"}[5m])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{job}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 0,
+        "h": 9,
+        "w": 8,
+        "x": 8
+      }
+    },
+    {
+      "id": 3,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Audit HTTP 5xx, %",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "100 * (sum by (job, uri) (rate(http_server_requests_seconds_count{job=~\"demo-rest|audit-service\",method=\"GET\",uri=\"/api/audit\",status=~\"5..\"}[5m])) or on (job, uri) (0 * sum by (job, uri) (rate(http_server_requests_seconds_count{job=~\"demo-rest|audit-service\",method=\"GET\",uri=\"/api/audit\"}[5m])))) / clamp_min(sum by (job, uri) (rate(http_server_requests_seconds_count{job=~\"demo-rest|audit-service\",method=\"GET\",uri=\"/api/audit\"}[5m])), 0.000000001)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{job}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 0,
+        "h": 9,
+        "w": 8,
+        "x": 16
+      }
+    },
+    {
+      "id": 4,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Audit queries by result, per second",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "sum by (result) (rate(footballscore_audit_queries_total{job=\"audit-service\"}[5m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{result}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 9,
+        "h": 9,
+        "w": 8,
+        "x": 0
+      }
+    },
+    {
+      "id": 5,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Gateway route requests per second",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "sum by (routeId, httpStatusCode) (rate(spring_cloud_gateway_requests_seconds_count{job=\"gateway-service\",routeId=\"footballscore-api\"}[5m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{routeId}} HTTP {{httpStatusCode}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 9,
+        "h": 9,
+        "w": 8,
+        "x": 8
+      }
+    },
+    {
+      "id": 6,
+      "options": {
+        "legend": {
+          "placement": "bottom",
+          "calcs": [],
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Service availability: 1 = UP",
+      "targets": [
+        {
+          "range": true,
+          "editorMode": "code",
+          "expr": "up{job=~\"demo-rest|audit-service|gateway-service\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ],
+      "type": "timeseries",
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "spanNulls": false,
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "y": 9,
+        "h": 9,
+        "w": 8,
+        "x": 16
+      }
+    },
+    {
+      "targets": [
+        {
+          "instant": true,
+          "editorMode": "code",
+          "expr": "100 * footballscore:audit_sli:ratio5m",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 99.5
+              }
+            ],
+            "mode": "absolute"
+          }
+        }
+      },
+      "id": 7,
+      "description": "Percentage of eligible requests completed with HTTP 2xx within 500 ms. Operational window: 5 minutes.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "options": {
+        "justifyMode": "auto",
+        "colorMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false,
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none"
+      },
+      "gridPos": {
+        "y": 18,
+        "h": 5,
+        "w": 8,
+        "x": 0
+      },
+      "type": "stat",
+      "title": "Audit SLI - last 5 minutes"
+    },
+    {
+      "targets": [
+        {
+          "instant": true,
+          "editorMode": "code",
+          "expr": "100 * footballscore:audit_sli:ratio7d",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 99.5
+              }
+            ],
+            "mode": "absolute"
+          }
+        }
+      },
+      "id": 8,
+      "description": "SLO: at least 99.5% of eligible requests return HTTP 2xx within 500 ms over 7 days. Uses available history until 7 days have accumulated.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "options": {
+        "justifyMode": "auto",
+        "colorMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false,
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none"
+      },
+      "gridPos": {
+        "y": 18,
+        "h": 5,
+        "w": 8,
+        "x": 8
+      },
+      "type": "stat",
+      "title": "Audit SLI - 7 days - target 99.5%"
+    },
+    {
+      "targets": [
+        {
+          "instant": true,
+          "editorMode": "code",
+          "expr": "100 * footballscore:audit_error_budget_remaining:ratio7d",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 25
+              }
+            ],
+            "mode": "absolute"
+          }
+        }
+      },
+      "id": 9,
+      "description": "Allowed bad requests: 0.5%. 100% means unused budget; 0% means exhausted; negative means exceeded. Uses available history.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "options": {
+        "justifyMode": "auto",
+        "colorMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false,
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none"
+      },
+      "gridPos": {
+        "y": 18,
+        "h": 5,
+        "w": 8,
+        "x": 16
+      },
+      "type": "stat",
+      "title": "Error budget remaining - 7 days"
+    }
+  ],
+  "version": 2,
+  "schemaVersion": 39,
+  "description": "Audit scenario: gateway-service -> demo-rest -> audit-service",
+  "tags": [
+    "footballscore",
+    "observability"
+  ],
+  "editable": false,
+  "uid": "footballscore-observability",
+  "timezone": "browser",
+  "time": {
+    "to": "now",
+    "from": "now-15m"
+  },
+  "title": "FootballScore - Audit Observability"
+}

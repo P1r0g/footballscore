@@ -1,0 +1,37 @@
+local.file_match "footballscore" {
+  path_targets = [
+    {"__path__" = "/var/log/footballscore/demo-rest.log", "job" = "footballscore-apps", "service" = "demo-rest"},
+    {"__path__" = "/var/log/footballscore/audit-service.log", "job" = "footballscore-apps", "service" = "audit-service"},
+    {"__path__" = "/var/log/footballscore/gateway-service.log", "job" = "footballscore-apps", "service" = "gateway-service"},
+  ]
+
+  sync_period = "5s"
+}
+
+loki.source.file "footballscore" {
+  targets    = local.file_match.footballscore.targets
+  forward_to = [loki.process.footballscore.receiver]
+}
+
+loki.process "footballscore" {
+  stage.json {
+    expressions = {
+      timestamp = "\"@timestamp\"",
+    }
+
+    drop_malformed = true
+  }
+
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339Nano"
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

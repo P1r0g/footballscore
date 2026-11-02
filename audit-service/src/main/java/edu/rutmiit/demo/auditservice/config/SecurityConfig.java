@@ -35,9 +35,15 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error")
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/prometheus"
+                        )
                         .permitAll()
 
+                        .requestMatchers("/error")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/audit")
                         .hasRole("audit.read")
 
