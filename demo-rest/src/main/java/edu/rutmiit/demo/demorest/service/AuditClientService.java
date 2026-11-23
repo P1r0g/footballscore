@@ -4,15 +4,13 @@ import edu.rutmiit.demo.demorest.config.RequestIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import java.net.http.HttpClient;
-import java.time.Duration;
 
 @Service
 public class AuditClientService {
@@ -22,22 +20,16 @@ public class AuditClientService {
 
     private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final RestClient restClient;
+    private final AuditRetry auditRetry;
 
     public AuditClientService(
             OAuth2AuthorizedClientManager authorizedClientManager,
             RestClient.Builder builder,
-            @Value("${audit.service.base-url}") String baseUrl
+            @Qualifier("auditRequestFactory") ClientHttpRequestFactory requestFactory,
+            @Value("${audit.service.base-url}") String baseUrl,
+            AuditRetry auditRetry
     ) {
         this.authorizedClientManager = authorizedClientManager;
-
-        var httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(500))
-                .build();
-
-        var requestFactory =
-                new JdkClientHttpRequestFactory(httpClient);
-
-        requestFactory.setReadTimeout(Duration.ofSeconds(2));
 
         this.restClient = builder
                 .baseUrl(baseUrl)
@@ -53,6 +45,7 @@ public class AuditClientService {
                     return execution.execute(request, body);
                 })
                 .build();
+        this.auditRetry = auditRetry;
     }
 
     public String getAuditLog() {
@@ -75,11 +68,11 @@ public class AuditClientService {
 
         log.info("Calling audit-service GET /api/audit");
 
-        String response = restClient.get()
+        String response = auditRetry.execute(() -> restClient.get()
                 .uri("/api/audit")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
-                .body(String.class);
+                .body(String.class));
 
         log.info("Ответ audit-service успешно получен");
 
