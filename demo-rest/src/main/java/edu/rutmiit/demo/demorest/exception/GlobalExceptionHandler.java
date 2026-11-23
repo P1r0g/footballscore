@@ -87,6 +87,21 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(AuditUpstreamException.class)
+    public ResponseEntity<ErrorResponse> handleAuditUpstream(
+            AuditUpstreamException exception, HttpServletRequest request) {
+        var status = exception.status();
+        return ResponseEntity.status(status).body(new ErrorResponse(
+                status.value(),
+                BASE_PROBLEM_URI + "audit-upstream-failure",
+                status.getReasonPhrase(),
+                exception.getMessage(),
+                request.getRequestURI(),
+                Instant.now(),
+                null
+        ));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception ex, HttpServletRequest req) {
         // Место для логирования: log.error("Unexpected error", ex);
